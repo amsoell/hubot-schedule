@@ -1,28 +1,28 @@
-# hubot-nowplaying
+# hubot-schedule
 
-Queries music services to report what is playing at the moment (and recently)
+Handles queries about upcoming scheduled events, looks them up in an iCalendar feed, and returns information to the user
 
-See [`src/nowplaying.coffee`](src/nowplaying.coffee) for full documentation.
+See [`src/schedule.coffee`](src/schedule.coffee) for full documentation.
 
 ## Installation
 
 In hubot project repo, run:
 
-`npm install hubot-nowplaying --save`
+`npm install hubot-schedule --save`
 
-Then add **hubot-nowplaying** to your `external-scripts.json`:
+Then add **hubot-schedule** to your `external-scripts.json`:
 
 ```json
 [
-  "hubot-nowplaying"
+  "hubot-schedule"
 ]
 ```
 
 ## Sample Interaction
 
 ```
-user1>> hubot what's playing?
-hubot>> "Stairway to Heaven" by Led Zeppelin is playing on Radio Paradise right now
-user1>> hubot what played before this?
-hubot>> "Idiot Wind" by Bob Dylan
+user1>> hubot schedule today?
+hubot>> Today's events: 
+hubot>> *Intern Orientation* from *9am–12pm
+hubot>> *Meeting with Client* rom *2pm–3pm
 ```
