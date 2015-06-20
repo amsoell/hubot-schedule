@@ -1,0 +1,36 @@
+{
+  "name": "hubot-schedule",
+  "description": "Checks an iCalendar feed for upcoming events and returns them to the user",
+  "version": "0.1.0",
+  "author": "Andy Soell <andy@teamsoell.com>",
+  "license": "MIT",
+  "keywords": "hubot, hubot-scripts, calendar, icalendar, ical, schedule",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/amsoell/hubot-schedule.git"
+  },
+  "bugs": {
+    "url": "https://github.com/amsoell/hubot-schedule/issues"
+  },
+  "dependencies": {
+    "ical"
+  },
+  "peerDependencies": {
+    "hubot": "2.x"
+  },
+  "devDependencies": {
+    "hubot": "2.x",
+    "mocha": "*",
+    "chai": "*",
+    "sinon-chai": "*",
+    "sinon": "*",
+    "grunt-mocha-test": "~0.7.0",
+    "grunt-release": "~0.6.0",
+    "matchdep": "~0.1.2",
+    "grunt-contrib-watch": "~0.5.3"
+  },
+  "main": "index.coffee",
+  "scripts": {
+    "test": "grunt test"
+  }
+}
