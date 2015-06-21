@@ -21,8 +21,11 @@ Then add **hubot-schedule** to your `external-scripts.json`:
 ## Sample Interaction
 
 ```
-user1>> hubot schedule today?
-hubot>> Today's events: 
-hubot>> *Intern Orientation* from *9am–12pm
-hubot>> *Meeting with Client* rom *2pm–3pm
+user1>> hubot schedule today
+hubot>> *Intern Orientation* from *9am* to *12pm*
+hubot>> *Meeting with Client* from *2pm* to *3pm*
+user1>> hubot schedule tomorrow
+hubot>> *Member Lunch* from *12pm* to *1pm*
+user1>> hubot schedule Wednesday
+hubot>> There are no events scheduled for Wednesday
 ```
