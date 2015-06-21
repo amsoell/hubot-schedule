@@ -67,7 +67,7 @@ showSchedule = (msg, limit = null) ->
           msg.send "There are no events scheduled for " + filter_label
 
 module.exports = (robot) ->
-  robot.respond /schedule$/i, (msg) ->
+  robot.respond /schedule( today)?/i, (msg) ->
     today = new Date
     showSchedule(msg, today)
   robot.respond /schedule tomorrow/i, (msg) ->
