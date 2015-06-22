@@ -29,13 +29,17 @@ getFormattedTime = (d) ->
     formatted += 'am'
 
 showSchedule = (msg, limit = null) ->
+  cals = {
+    "south":"http://booking.saltmines.us/info/webcal/258B66.ics",
+    "north":"http://booking.saltmines.us/info/webcal/26C631.ics"
+  }
   days_of_week = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
   today = new Date
   if limit == null
     filter_start    = new Date
     filter_end      = new Date('2020-12-31 23:59:59')
   else
-    #! Fix this—replace with tomorrow at midnight
     filter_start    = new Date((limit.getYear()+1900)+'-'+(limit.getMonth()+1)+'-'+limit.getDate()+' 00:00:00')
     filter_end      = new Date((limit.getYear()+1900)+'-'+(limit.getMonth()+1)+'-'+limit.getDate()+' 23:59:59')
 
@@ -44,27 +48,28 @@ showSchedule = (msg, limit = null) ->
   else
     filter_label = days_of_week[limit.getDay()]
 
-  msg.http("http://booking.saltmines.us/info/webcal/258B66.ics")
-    .get() (err, res, body) ->
-      if res.statusCode is 200 and !err?
-        ics = ical.parseICS(body)
-        event_count = 0
-        for _, event of ics
-          if event.type == 'VEVENT'
-            starts    = new Date(event.start)
-            starts_formatted = getFormattedTime(starts)
+  for calendar_name,calendar_url of cals
+    do (calendar_name) ->
+      msg.http(calendar_url)
+        .get() (err, res, body) ->
+          if res.statusCode is 200 and !err?
+            ics = ical.parseICS(body)
+            event_list = []
+            for _, event of ics
+              if event.type == 'VEVENT'
+                starts    = new Date(event.start)
+                ends   = new Date(event.end)
 
-            ends   = new Date(event.end)
-            ends_formatted = getFormattedTime(ends)
-
-            if event.summary == undefined
-              event.summary = event.description
-            if starts >= filter_start
-              if ends <= filter_end
-                event_count++
-                msg.send "*#{event.summary}* from *#{starts_formatted}* to *#{ends_formatted}*"
-        if event_count<=0
-          msg.send "There are no events scheduled for " + filter_label
+                if event.summary == undefined
+                  event.summary = event.description
+                if starts >= filter_start and ends <= filter_end
+                  event_list.push "*#{event.summary}* from *#{getFormattedTime(starts)}* to *#{getFormattedTime(ends)}*"
+            if event_list.length<=0
+              msg.send "There are no events scheduled for " + filter_label + " at " + calendar_name
+            else
+              msg.send "Scheduled events for " + filter_label + " at " + calendar_name
+              for event, k in event_list
+                msg.send event
 
 module.exports = (robot) ->
   robot.respond /schedule( today)?$/i, (msg) ->
