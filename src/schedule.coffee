@@ -8,8 +8,7 @@
 #   None
 #
 # Commands:
-#   hubot schedule - Find out what events are scheduled for today
-#   hubot schedule (tomorrow|monday|etc) - Find out events that are scheduled in the future
+#   hubot schedule [today|tomorrow|monday] [calendarname] - Find out what events are scheduled
 ical = require 'ical'
 
 getFormattedTime = (d) ->
@@ -28,11 +27,15 @@ getFormattedTime = (d) ->
   else
     formatted += 'am'
 
-showSchedule = (msg, limit = null) ->
+showSchedule = (msg, limit = null, cal_index = null) ->
   cals = {
     "south":"http://booking.saltmines.us/info/webcal/258B66.ics",
     "north":"http://booking.saltmines.us/info/webcal/26C631.ics"
   }
+  if cal_index and cals.hasOwnProperty(cal_index)
+    feed = cals[cal_index]
+    cals = {}
+    cals[cal_index] = feed
   days_of_week = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
   today = new Date
@@ -72,21 +75,34 @@ showSchedule = (msg, limit = null) ->
                 msg.send event
 
 module.exports = (robot) ->
-  robot.respond /schedule( today)?$/i, (msg) ->
+  robot.respond /schedule$/i, (msg) ->
     today = new Date
     showSchedule(msg, today)
-  robot.respond /schedule tomorrow/i, (msg) ->
-    today = new Date
-    tomorrow = new Date(today.getTime() + 86400000) # Add one day
-    showSchedule(msg, tomorrow)
-  robot.respond /schedule (monday|tuesday|wednesday|thursday|friday|saturday|sunday)/i, (msg) ->
-    days_of_week = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
-    target_day = msg.match[1].toLowerCase()
-
-    target = new Date
-
-    while days_of_week[target.getDay()] != target_day
-      target = new Date(target.getTime() + 86400000) # Add one day
-
-    showSchedule(msg, target)
-
+  robot.respond /schedule (\w*)? ?(\w*)$/i, (msg) ->
+    days_of_week = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
+    if msg.match[1] in days_of_week
+      target_day = msg.match[1].toLowerCase()
+      target = new Date
+      while days_of_week[target.getDay()] != target_day
+        target = new Date(target.getTime() + 86400000) # Add one day
+      showSchedule(msg, target, msg.match[2])
+    else if msg.match[2] in days_of_week
+      target_day = msg.match[2].toLowerCase()
+      target = new Date
+      while days_of_week[target.getDay()] != target_day
+        target = new Date(target.getTime() + 86400000) # Add one day
+      showSchedule(msg, target, msg.match[1])
+    else if msg.match[1]=="today"
+      today = new Date
+      showSchedule(msg, today, msg.match[2])
+    else if msg.match[1]=="tomorrow"
+      today = new Date
+      tomorrow = new Date(today.getTime() + 86400000) # Add one day
+      showSchedule(msg, tomorrow, msg.match[2])
+    else if msg.match[2]=="today" or msg.match[1]
+      today = new Date
+      showSchedule(msg, today, msg.match[1])
+    else if msg.match[2]=="tomorrow"
+      today = new Date
+      tomorrow = new Date(today.getTime() + 86400000) # Add one day
+      showSchedule(msg, tomorrow, msg.match[1])
