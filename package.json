@@ -13,7 +13,8 @@
     "url": "https://github.com/amsoell/hubot-schedule/issues"
   },
   "dependencies": {
-    "ical": "*"
+    "ical": "*",
+    "request", "*"
   },
   "peerDependencies": {
     "hubot": "2.x"
