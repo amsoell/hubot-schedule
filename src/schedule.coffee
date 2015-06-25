@@ -15,6 +15,11 @@ request = require 'request'
 class Schedule
   constructor: (@robot) ->
     self = this
+    @config = {
+      interval_ics_check: 8*60*1000,
+      interval_upcoming_check: 15*60*1000,
+      debug_level: 0
+    }
     cals = {
       "south":"http://booking.saltmines.us/info/webcal/258B66.ics",
       "north":"http://booking.saltmines.us/info/webcal/26C631.ics"
@@ -40,7 +45,7 @@ class Schedule
     @addUpcomingEvent = (event) ->
       self = this
       self.upcomingEvents.push event
-#      console.log(self.upcomingEvents)
+      console.log("adding event: "+event.title) if self.config.debug_level>=2
 
     @indexUpcomingEvents = () ->
       self.upcomingEvents = []
@@ -49,12 +54,14 @@ class Schedule
         do (calendar_name) ->
           request({uri: calendar_url}, (err, resp, body) ->
             if !err && resp.statusCode == 200
+              console.log('ICS received: '+calendar_name) if self.config.debug_level>=2
               ics = ical.parseICS(body)
               range_start = new Date
               range_end   = new Date(range_start.getTime() + 7*24*60*60*1000) # Add one week
               event_list = []
               for _, event of ics
                 if event.type == 'VEVENT'
+                  console.log('  considering:'+event.summary) if self.config.debug_level>=2
                   starts = new Date(event.start)
                   if (range_start < starts) and (starts < range_end)
                     if event.summary == undefined
@@ -64,18 +71,25 @@ class Schedule
                       calendar: calendar_name,
                       starts: starts
                     }
-
                     self.addUpcomingEvent(new_event)
+
+            else
+              console.log("Error: "+err) if self.config.debug_level>=1
           )
 
 
     @checkUpcomingEvents = () ->
+      console.log('checking...') if self.config.debug_level>=1
       rightnow = new Date
-      console.log(self.upcomingEvents)
+      for event in self.upcomingEvents
+        time_until_event = event.starts.getTime() - rightnow.getTime()
+        console.log(event.title+': '+time_until_event) if self.config.debug_level>=1
+        if (time_until_event > 0) and (time_until_event < (self.config.interval_upcoming_check))
+          self.robot.messageRoom "#general", "*Reminder:* An event for *" + event.title + "* is taking place at *" + event.calendar + "* in about "+(Math.ceil(time_until_event/1000/60)+1)+" minutes"
 
     # Load upcoming events into memory, hashed by timestamp
-    setInterval(@checkUpcomingEvents, 4*1000) # 5*1000 = 5 seconds
-    setInterval(@indexUpcomingEvents, 5*1000)
+    setInterval(@checkUpcomingEvents, @config.interval_upcoming_check)
+    setInterval(@indexUpcomingEvents, @config.interval_ics_check)
 
   showSchedule: (msg, limit = null, cal_index = null) ->
 

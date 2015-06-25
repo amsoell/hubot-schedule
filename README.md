@@ -1,6 +1,7 @@
 # hubot-schedule
 
 Handles queries about upcoming scheduled events, looks them up in an iCalendar feed, and returns information to the user
+Also automatically sends upcoming event reminders to the #general room
 
 See [`src/schedule.coffee`](src/schedule.coffee) for full documentation.
 
@@ -29,3 +30,6 @@ hubot>> *Member Lunch* from *12pm* to *1pm*
 user1>> hubot schedule Wednesday
 hubot>> There are no events scheduled for Wednesday
 ```
+## Todo
+
+- [ ] Mute upcoming event reminders on weekends and non-business hours
