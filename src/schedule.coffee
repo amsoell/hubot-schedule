@@ -17,7 +17,7 @@ class Schedule
     self = this
     @config = {
       interval_ics_check: 8*60*1000,
-      interval_upcoming_check: 15*60*1000,
+      interval_upcoming_check: 12*60*1000,
       debug_level: 0
     }
     cals = {
