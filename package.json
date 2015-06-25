@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "ical": "*",
-    "request", "*"
+    "request": "*"
   },
   "peerDependencies": {
     "hubot": "2.x"
