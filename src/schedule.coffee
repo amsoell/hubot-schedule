@@ -16,11 +16,11 @@ class Schedule
   constructor: (@robot) ->
     self = this
     @config = {
-      interval_ics_check: 8*60*1000,
-      interval_upcoming_check: 12*60*1000,
+      interval_ics_check: 8*60*1000,       # Might I recommend every 8 minutes?
+      interval_upcoming_check: 12*60*1000, # If I may be so bold, 12 minutes is a good interval
       debug_level: 0
     }
-    cals = {
+    @cals = {
       "south":"http://booking.saltmines.us/info/webcal/258B66.ics",
       "north":"http://booking.saltmines.us/info/webcal/26C631.ics"
     }
@@ -43,14 +43,13 @@ class Schedule
         formatted += 'am'
 
     @addUpcomingEvent = (event) ->
-      self = this
       self.upcomingEvents.push event
       console.log("adding event: "+event.title) if self.config.debug_level>=2
 
     @indexUpcomingEvents = () ->
       self.upcomingEvents = []
-
-      for calendar_name,calendar_url of cals
+      console.log('Indexing ICS') if self.config.debug_level>=2
+      for calendar_name,calendar_url of self.cals
         do (calendar_name) ->
           request({uri: calendar_url}, (err, resp, body) ->
             if !err && resp.statusCode == 200
@@ -95,12 +94,12 @@ class Schedule
 
     self = this
 
-    if cal_index and self.cals.hasOwnProperty(cal_index)
-      feed = self.cals[cal_index]
+    if cal_index and @cals.hasOwnProperty(cal_index)
+      feed = @cals[cal_index]
       req_cals = {}
       req_cals[cal_index] = feed
     else
-      req_cals = self.cals
+      req_cals = @cals
     days_of_week = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
     today = new Date
